@@ -38,7 +38,6 @@ bool OurCFG::isReachable(BasicBlock *BB) {
 std::vector<BasicBlock *> OurCFG::getPredecessors(BasicBlock *BB) {
 
   std::vector<BasicBlock *> Predecessors;
-  //svaki blok ciji skup sledbenika sadrzi BB prethodnik je BB
   for (auto &Pair : AdjacencyList) {
     for (BasicBlock *Successor : Pair.second) {
       if (Successor == BB) {

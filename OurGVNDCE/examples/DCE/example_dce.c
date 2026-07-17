@@ -1,18 +1,15 @@
-// 1. Jednostavna mrtva operacija
 int dead_add(int a, int b) {
-    int x = a + b;   // treba da se obrise
+    int x = a + b; 
     return 0;
 }
 
 
-// 2. Koriscen rezultat - ne sme da obrise
 int used_add(int a, int b) {
-    int x = a + b;   // mora da ostane
+    int x = a + b;   
     return x;
 }
 
 
-// 3. Lanac mrtvih instrukcija
 int dead_chain(int a, int b) {
     int x = a + b;
     int y = x * 10;
@@ -22,16 +19,16 @@ int dead_chain(int a, int b) {
 }
 
 
-// 4. Mrtav icmp
+
 int dead_compare(int a, int b) {
-    int result = (a < b);   // treba da se obrise
+    int result = (a < b);   
     return 10;
 }
 
 
-// 5. Koriscen icmp
+
 int used_compare(int a, int b) {
-    int result = (a < b);   // mora da ostane
+    int result = (a < b);  
 
     if (result)
         return 1;
@@ -40,17 +37,16 @@ int used_compare(int a, int b) {
 }
 
 
-// 6. Vise operacija
+
 int mixed(int a, int b) {
-    int x = a + b;       // mrtvo
-    int y = a - b;       // mrtvo
-    int z = a * b;       // koristi se
+    int x = a + b;      
+    int y = a - b;      
+    int z = a * b;       
 
     return z;
 }
 
 
-// 7. Store ne sme da se obrise
 int store_test() {
     int x;
 
@@ -60,7 +56,6 @@ int store_test() {
 }
 
 
-// 8. Više basic blokova
 int multiple_blocks(int a) {
 
     int x = a + 10;  // mrtvo

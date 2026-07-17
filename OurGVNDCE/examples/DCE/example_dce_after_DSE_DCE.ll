@@ -61,15 +61,15 @@ define dso_local i32 @used_compare(i32 noundef %0, i32 noundef %1) #0 {
   %12 = icmp ne i32 %11, 0
   br i1 %12, label %13, label %14
 
-13:                                               ; preds = %2
+13:                                               
   store i32 1, ptr %3, align 4
   br label %15
 
-14:                                               ; preds = %2
+14:                                               
   store i32 0, ptr %3, align 4
   br label %15
 
-15:                                               ; preds = %14, %13
+15:                                               
   %16 = load i32, ptr %3, align 4
   ret i32 %16
 }
@@ -104,7 +104,7 @@ define dso_local i32 @multiple_blocks(i32 noundef %0) #0 {
   %6 = icmp sgt i32 %5, 0
   br i1 %6, label %7, label %11
 
-7:                                                ; preds = %1
+7:                                                
   %8 = load i32, ptr %3, align 4
   %9 = mul nsw i32 %8, 2
   store i32 %9, ptr %4, align 4
@@ -112,11 +112,11 @@ define dso_local i32 @multiple_blocks(i32 noundef %0) #0 {
   store i32 %10, ptr %2, align 4
   br label %12
 
-11:                                               ; preds = %1
+11:                                               
   store i32 0, ptr %2, align 4
   br label %12
 
-12:                                               ; preds = %11, %7
+12:                                               
   %13 = load i32, ptr %2, align 4
   ret i32 %13
 }

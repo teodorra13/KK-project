@@ -1,4 +1,4 @@
-// 1. Obican mrtav store
+
 int dead_store_simple()
 {
     int x;
@@ -9,7 +9,6 @@ int dead_store_simple()
 }
 
 
-// 2. Store koji se koristi
 int live_store()
 {
     int x;
@@ -20,8 +19,6 @@ int live_store()
 }
 
 
-// 3. Dva store-a bez load-a
-// prvi treba da se ukloni
 int overwrite_store()
 {
     int x;
@@ -33,8 +30,6 @@ int overwrite_store()
 }
 
 
-// 4. Vise uzastopnih store-ova
-// samo poslednji ostaje
 int multiple_overwrite()
 {
     int x;
@@ -47,9 +42,6 @@ int multiple_overwrite()
 }
 
 
-// 5. Store pre call-a
-// ne sme da se ukloni
-// jer funkcija moze da cita x
 void unknown_function();
 
 
@@ -65,8 +57,6 @@ int store_before_call()
 }
 
 
-// 6. Store posle call-a
-// prvi store posle call-a ostaje
 int store_after_call()
 {
     int x;
@@ -79,8 +69,6 @@ int store_after_call()
 }
 
 
-// 7. Store pre call-a i novi store posle call-a
-// x=10 pre call-a treba da ostane
 int overwrite_after_call()
 {
     int x;
@@ -95,8 +83,6 @@ int overwrite_after_call()
 }
 
 
-// 8. Dva store-a posle call-a
-// prvi posle call-a treba da se obrise
 int two_store_after_call()
 {
     int x;
@@ -109,9 +95,6 @@ int two_store_after_call()
     return x;
 }
 
-
-// 9. Vise promenljivih posle call-a
-// proverava DefinedAfterCall za vise lokacija
 int multiple_variables_after_call()
 {
     int x;
@@ -128,8 +111,6 @@ int multiple_variables_after_call()
 }
 
 
-// 10. Load izmedju store-ova
-// prvi store NE SME da se ukloni
 int load_between_stores()
 {
     int x;
@@ -147,8 +128,7 @@ int load_between_stores()
 }
 
 
-// 11. Dva call-a
-// proverava reset DefinedAfterCall
+
 int multiple_calls()
 {
     int x;
@@ -167,8 +147,6 @@ int multiple_calls()
 }
 
 
-// 12. Call koji se samo deklarise
-// da LLVM ne optimizuje unapred
 int declare_call_test()
 {
     unknown_function();

@@ -1,6 +1,6 @@
 # LLVM GVN, DSE & DCE Passes
 
-LLVM pass plugin implementing Global Value Numbering, Dead Store Elimination and Dead Code Elimination. GVN removes redundant computations, DSE removes overwritten stores, and DCE removes unused instructions without side effects.
+LLVM legacy pass plugin implementing Global Value Numbering, Dead Store Elimination and Dead Code Elimination. GVN removes redundant computations, DSE removes overwritten or unused local stores, and DCE removes unused computations without side effects. The combined pass repeatedly runs GVN, DSE and DCE until no pass changes the function.
 
 ## Requirements
 
@@ -66,3 +66,5 @@ For GVN, promote stack variables to SSA form before running the pass:
   example_mem2reg.ll \
   -S -o example_gvn_out.ll
 ```
+
+The implementation is conservative around memory accesses, aliases and function calls.

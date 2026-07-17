@@ -1,21 +1,16 @@
 #include "GlobalValueNumbering.h"
 
-// Blok A dominira blokom B ako svaki put od ulaza funkcije do B prolazi kroz A
-// Svaki dostizan blok dominira samim sobom
-// dominacija nije isto sto i redosled blokova u .ll fajlu : ona zavisi od svih mogucih putanja izvrsavanja
-
-
 
 void GlobalValueNumbering::initializeDominators(Function &F, OurCFG &CFG) {
 
   BasicBlock *Entry = &F.front();
 
   for (BasicBlock &BB : F) {
-        // nedostizni  blokovi se preskacu da sopstvena analiza dominacije ne bi
-        // izvlacila zakljucke nad cvorovima koji nisu deo regularno toka izvrsavanja
+
         if (!CFG.isReachable(&BB)) {
           continue;
         }
+
         if (&BB == Entry) {
           Dominators[&BB].insert(&BB);
         }
@@ -31,17 +26,17 @@ void GlobalValueNumbering::initializeDominators(Function &F, OurCFG &CFG) {
 }
 
 bool GlobalValueNumbering::areTheSameSets( std::unordered_set<BasicBlock *> &First, std::unordered_set<BasicBlock *> &Second) {
-  if (First.size() != Second.size()) {
-    return false;
-  }
-
-  for (BasicBlock *BB : First) {
-    if (Second.find(BB) == Second.end()) {
+    if (First.size() != Second.size()) {
       return false;
     }
-  }
 
-  return true;
+    for (BasicBlock *BB : First) {
+        if (Second.find(BB) == Second.end()) {
+          return false;
+        }
+    }
+
+    return true;
 }
 
 void GlobalValueNumbering::calculateDominators(Function &F, OurCFG &CFG) {
@@ -52,7 +47,7 @@ void GlobalValueNumbering::calculateDominators(Function &F, OurCFG &CFG) {
       Changed = false;
 
       for (BasicBlock &BB : F) {
-          if (&BB == Entry || !CFG.isReachable(&BB)) { //Dom(entry) je konacan,a nedostizne ne analiziramo
+          if (&BB == Entry || !CFG.isReachable(&BB)) {
             continue;
           }
 
@@ -64,7 +59,7 @@ void GlobalValueNumbering::calculateDominators(Function &F, OurCFG &CFG) {
                 continue;
               }
 
-              if (FirstPredecessor) { // Kopiramo skup prvog dostiznog prethodnika i to je pocetna vresnost lokalnog preseka
+              if (FirstPredecessor) {
                 for (BasicBlock *Dominator : Dominators[Predecessor]) {
                   NewDominators.insert(Dominator);
                 }
@@ -74,7 +69,7 @@ void GlobalValueNumbering::calculateDominators(Function &F, OurCFG &CFG) {
                 std::unordered_set<BasicBlock *> Intersection;
 
                 for (BasicBlock *Dominator : NewDominators) {
-                  if (Dominators[Predecessor].find(Dominator) !=  Dominators[Predecessor].end()) { // preseci sa skupom svakog sledeceg prethodnika jer dominator mora biti prisutan na svim ulaznim outanjama
+                  if (Dominators[Predecessor].find(Dominator) !=  Dominators[Predecessor].end()) {
                     Intersection.insert(Dominator);
                   }
                 }
@@ -103,7 +98,8 @@ bool GlobalValueNumbering::dominates(Instruction *First, Instruction *Second) {
 }
 
 int GlobalValueNumbering::getValueNumber(Value *V) {
-  // dve razlicite Value* instane smeju dobiti isti broj tek kada je algoritam dokazao ekvivalentnost
+
+
   if (ValueNumbers.find(V) == ValueNumbers.end()) {
     ValueNumbers[V] = NextValueNumber++;
   }
@@ -139,7 +135,7 @@ bool GlobalValueNumbering::isConstantInt(Value *V) {
   return isa<ConstantInt>(V);
 }
 
-bool GlobalValueNumbering::areTheSameConstants(Value *First, Value *Second) { // poredi tip i konkretne vrednosti konstantee
+bool GlobalValueNumbering::areTheSameConstants(Value *First, Value *Second) {
   ConstantInt *FirstConstant = dyn_cast<ConstantInt>(First);
   ConstantInt *SecondConstant = dyn_cast<ConstantInt>(Second);
 
@@ -167,8 +163,6 @@ bool GlobalValueNumbering::haveTheSameOperands(Instruction *First, Instruction *
 }
 
 
-// komutativne su add, mul, icmp eq, icmp ne -> za njih se proverava isti i zemenjeni redosled operanada
-// sub sdiv udiv i uredjena porednjenja nisu komutativna -> TU ZAHTEVAMMO ISTI REDOSLED
 
 bool GlobalValueNumbering::isCommutative(Instruction *I) {
   if (isa<ICmpInst>(I)) {
@@ -204,8 +198,7 @@ bool GlobalValueNumbering::isTheSameInstruction(Instruction *First, Instruction 
 
 Instruction *GlobalValueNumbering::alreadySaved(Instruction *I) {
   for (Instruction *SavedInstruction : SavedInstructions) {
-    if (dominates(SavedInstruction, I) &&
-        isTheSameInstruction(SavedInstruction, I)) {
+    if (dominates(SavedInstruction, I) && isTheSameInstruction(SavedInstruction, I)) {
       return SavedInstruction;
     }
   }
@@ -220,43 +213,43 @@ void GlobalValueNumbering::removeRedundantInstructions() {
 }
 
 bool GlobalValueNumbering::runOnFunction(Function &F) {
-  ValueNumbers.clear();
-  SavedInstructions.clear();
-  InstructionsToRemove.clear();
-  Dominators.clear();
-  NextValueNumber = 1;
+      ValueNumbers.clear();
+      SavedInstructions.clear();
+      InstructionsToRemove.clear();
+      Dominators.clear();
+      NextValueNumber = 1;
 
-  OurCFG CFG(F);
-  CFG.DFS(&F.front());
-  initializeDominators(F, CFG);
-  calculateDominators(F, CFG);
+      OurCFG CFG(F);
+      CFG.DFS(&F.front());
+      initializeDominators(F, CFG);
+      calculateDominators(F, CFG);
 
-  bool Changed = false;
+      bool Changed = false;
 
-  for (BasicBlock &BB : F) {
-    if (!CFG.isReachable(&BB)) {
-      continue;
-    }
+      for (BasicBlock &BB : F) {
+          if (!CFG.isReachable(&BB)) {
+            continue;
+          }
 
-    for (Instruction &I : BB) {
-      if (isInteresting(&I)) {
-        if (Instruction *SavedInstruction = alreadySaved(&I)) {
-          ValueNumbers[&I] = getValueNumber(SavedInstruction);
-          I.replaceAllUsesWith(SavedInstruction);
-          InstructionsToRemove.push_back(&I);
-          Changed = true;
-        }
-        else {
-          getValueNumber(&I);
-          SavedInstructions.push_back(&I);
-        }
+          for (Instruction &I : BB) {
+              if (isInteresting(&I)) {
+                  if (Instruction *SavedInstruction = alreadySaved(&I)) {
+                      ValueNumbers[&I] = getValueNumber(SavedInstruction);
+                      I.replaceAllUsesWith(SavedInstruction);
+                      InstructionsToRemove.push_back(&I);
+                      Changed = true;
+                  }
+                  else {
+                      getValueNumber(&I);
+                      SavedInstructions.push_back(&I);
+                  }
+              }
+              else {
+                getValueNumber(&I);
+              }
+          }
       }
-      else {
-        getValueNumber(&I);
-      }
-    }
-  }
 
-  removeRedundantInstructions();
-  return Changed;
+      removeRedundantInstructions();
+      return Changed;
 }

@@ -7,6 +7,7 @@ int gvn_local_transitive(int a, int b) {
 }
 
 int gvn_dominating_branch(int condition, int a, int b) {
+
     int first = a + b;
 
     if (condition) {
@@ -42,8 +43,3 @@ int gvn_division(int a, int b) {
       return first + same + (int) unsigned_value + reversed;
 }
 
-int gvn_memory_conservative(int *value) {
-      int first = *value + 1;
-      int second = *value + 1;
-      return first + second;
-}

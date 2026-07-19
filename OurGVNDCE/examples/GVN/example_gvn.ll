@@ -1,5 +1,5 @@
 
-define dso_local i32 @gvn_local_transitive(i32 noundef %0, i32 noundef %1) {
+define dso_local i32 @gvn_local_transitive(i32 noundef %0, i32 noundef %1)  {
   %3 = add i32 %0, %1
   %4 = add i32 %1, %0
   %5 = mul i32 %3, 2
@@ -7,6 +7,7 @@ define dso_local i32 @gvn_local_transitive(i32 noundef %0, i32 noundef %1) {
   %7 = add i32 %5, %6
   ret i32 %7
 }
+
 
 define dso_local i32 @gvn_dominating_branch(i32 noundef %0, i32 noundef %1, i32 noundef %2)  {
   %4 = add i32 %1, %2
@@ -46,6 +47,7 @@ define dso_local i32 @gvn_sibling_branches(i32 noundef %0, i32 noundef %1, i32 n
   ret i32 %.0
 }
 
+
 define dso_local i32 @gvn_comparisons(i32 noundef %0, i32 noundef %1)  {
   %3 = icmp eq i32 %0, %1
   %4 = zext i1 %3 to i32
@@ -61,7 +63,8 @@ define dso_local i32 @gvn_comparisons(i32 noundef %0, i32 noundef %1)  {
   ret i32 %13
 }
 
-define dso_local i32 @gvn_division(i32 noundef %0, i32 noundef %1) {
+
+define dso_local i32 @gvn_division(i32 noundef %0, i32 noundef %1)  {
   %3 = sdiv i32 %0, %1
   %4 = sdiv i32 %0, %1
   %5 = udiv i32 %0, %1
@@ -73,11 +76,4 @@ define dso_local i32 @gvn_division(i32 noundef %0, i32 noundef %1) {
 }
 
 
-define dso_local i32 @gvn_memory_conservative(ptr noundef %0)  {
-  %2 = load i32, ptr %0, align 4
-  %3 = add i32 %2, 1
-  %4 = load i32, ptr %0, align 4
-  %5 = add i32 %4, 1
-  %6 = add i32 %3, %5
-  ret i32 %6
-}
+
